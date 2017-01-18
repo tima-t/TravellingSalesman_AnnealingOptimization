@@ -58,6 +58,7 @@ def main():
   temp = 1000
   coolingRate = 0.003
   heatCoeficient = 1 - coolingRate
+  numberRepetitions = 3
   currentTour = Tour(tourManager, tourManager.numberOfCities())
   currentTour.generateTour()
   print("Initial solution distance %d" % currentTour.getDistance())
@@ -67,30 +68,30 @@ def main():
   tourBest.setTour(currentTour.getTour())
 
   while(temp > 1):
-    newTour = Tour(tourManager,tourManager.numberOfCities())
-    newTour.setTour(currentTour.getTour())
+    for i in range(0,int(numberRepetitions)):
+      newTour = Tour(tourManager,tourManager.numberOfCities())
+      newTour.setTour(currentTour.getTour())
 
-    tourPos1 = (int)(tourManager.numberOfCities() * random.uniform(0, 1))
-    tourPos2 = (int)(tourManager.numberOfCities() * random.uniform(0, 1))
+      tourPos1 = (int)(tourManager.numberOfCities() * random.uniform(0, 1))
+      tourPos2 = (int)(tourManager.numberOfCities() * random.uniform(0, 1))
 
-    
+      citySwap1 = newTour.getCity(tourPos1)
+      citySwap2 = newTour.getCity(tourPos2)
 
-    citySwap1 = newTour.getCity(tourPos1)
-    citySwap2 = newTour.getCity(tourPos2)
+      newTour.setCity(tourPos2, citySwap1)
+      newTour.setCity(tourPos1, citySwap2)
 
-    newTour.setCity(tourPos2, citySwap1)
-    newTour.setCity(tourPos1, citySwap2)
+      currentEnergy = currentTour.getDistance()
+      newEnergy = newTour.getDistance()
 
-    currentEnergy = currentTour.getDistance()
-    newEnergy = newTour.getDistance()
+      if(acceptanceProbability(currentEnergy, newEnergy,temp) > random.random()):
+        currentTour.setTour(newTour.getTour())
+      
+      if (currentTour.getDistance() < tourBest.getDistance()) :
+        tourBest.setTour(currentTour.getTour())
 
-    if(acceptanceProbability(currentEnergy, newEnergy,temp) > random.random()):
-      currentTour.setTour(newTour.getTour())
-    
-    if (currentTour.getDistance() < tourBest.getDistance()) :
-      tourBest.setTour(currentTour.getTour())
-    
     temp *= heatCoeficient
+    numberRepetitions += 0.02
 
   print("Final slution is :%d" % tourBest.getDistance())
   print("The tour is : %s" % tourBest )
